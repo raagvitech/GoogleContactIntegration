@@ -14,7 +14,6 @@ public class updateBulkGcontacts {
         Set<Id> conIds = new Set<Id>();
         Http http=new Http();
         HttpRequest req = new HttpRequest();      
-        String key = 'AIzaSyCfaCukF1akyPBunr6HfCtzBhSxdepCRiE';
         req.setEndpoint('callout:Connectsalesforces' +'/v1/people:batchCreateContacts?sources=READ_SOURCE_TYPE_CONTACT');
         List<Map<String, Map<String, Object>>> conactList = new List<Map<String, Map<String, Object>>>();    
         
@@ -110,8 +109,7 @@ public class updateBulkGcontacts {
         }
         body = body.removeEnd(',');
         body += '},"readMask": "names","updateMask": "names,emailAddresses,phoneNumbers","sources":["READ_SOURCE_TYPE_CONTACT"]}';
-        req.setBody(body);
-        String key = 'AIzaSyCfaCukF1akyPBunr6HfCtzBhSxdepCRiE';    
+        req.setBody(body);  
         req.setEndpoint('callout:Connectsalesforces' +'/v1/people:batchUpdateContacts?sources=READ_SOURCE_TYPE_CONTACT');    
         req.setHeader('Content-Type','application/json');
         req.setMethod('POST');
