@@ -3,52 +3,6 @@
 */
 public class updateBulkGcontacts {
     
-    private static String code;  
-    public static string authtoken{get;set;}
-    public static string bodyprint{get;set;}
-    public string phoneNumber{get;set;}
-    public static List<googleContactInfo> googleContactInfotList {get; set;}
-    private static string CLIENT_SECRET='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';
-    private static string CLIENT_ID='731692654244-jkahog3pcn6rh079p463rrdl3is62km0.apps.googleusercontent.com';//Fill as per your registered app settings in google console
-    private static string REDIRECT_URL='https://raagvitech137-dev-ed--c.develop.vf.force.com/apex/googleAuthContactPage?core.apexpages.request.devconsole=1';
-    private static string OAUTH_TOKEN_URL='https://accounts.google.com/o/oauth2/token';
-    private static string OAUTH_CODE_END_POINT_URL='https://accounts.google.com/o/oauth2/auth';
-    private static string GRANT_TYPE='grant_type=authorization_code';
-    private static string SCOPE='https://www.google.com/m8/feeds';
-    private static string STATE='/profile';
-    
-    public updateBulkGcontacts(){       
-        code = ApexPages.currentPage().getParameters().get('code');
-        if (code != '' && code != null) {
-            AccessToken();
-            System.debug('inside AccessToken()');
-        }
-    }
-    
-    public static pagereference connect(){
-        String x=OAUTH_CODE_END_POINT_URL+'?scope='+EncodingUtil.urlEncode(SCOPE,'UTF-8')+'&state='+EncodingUtil.urlEncode(STATE,'UTF-8')+'&redirect_uri='+EncodingUtil.urlEncode(REDIRECT_URL,'UTF-8')+'&response_type=code&client_id='+CLIENT_ID;
-        pagereference p=new pagereference(x);
-        return p;
-    }
-    
-    
-    public static pagereference AccessToken(){
-        System.debug('AccessToken method called');
-        string codeparam=apexpages.currentpage().getparameters().get('code');
-        Http h = new Http();
-        String body='code='+codeparam+'&client_id='+CLIENT_ID+'&client_secret='+CLIENT_SECRET+'&redirect_uri='+REDIRECT_URL+'&'+GRANT_TYPE;
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(OAUTH_TOKEN_URL);
-        req.setHeader('Content-Type','application/x-www-form-urlencoded');
-        req.setMethod('POST');
-        req.setBody(body);
-        HttpResponse res = h.send(req);
-        getAccessToken getAccessTokenFromGContactApi = (getAccessToken)JSON.deserialize(res.getBody(), getAccessToken.class);     
-        authtoken = getAccessTokenFromGContactApi.access_token;
-        System.debug('authtoken======='+authtoken);
-        return null;
-    } 
-    
     public static void createContact(Set<Id> conIdsets){
         List<Contact> conList = [SELECT Id, FirstName, LastName, Email, Phone, ExternalSourceId__c, etag__c FROM contact WHERE Id IN :conIdsets];
         createContact(conList);
@@ -61,7 +15,7 @@ public class updateBulkGcontacts {
         Http http=new Http();
         HttpRequest req = new HttpRequest();      
         String key = 'AIzaSyCfaCukF1akyPBunr6HfCtzBhSxdepCRiE';
-        req.setEndpoint('https://people.googleapis.com/v1/people:batchCreateContacts?sources=READ_SOURCE_TYPE_CONTACT&key=' + key);
+        req.setEndpoint('callout:Connectsalesforces' +'/v1/people:batchCreateContacts?sources=READ_SOURCE_TYPE_CONTACT');
         List<Map<String, Map<String, Object>>> conactList = new List<Map<String, Map<String, Object>>>();    
         
         for(Contact con : conList){
@@ -100,8 +54,6 @@ public class updateBulkGcontacts {
         body = body.removeEnd('}') + ',"readMask": "names","sources":["READ_SOURCE_TYPE_CONTACT"]}';
         req.setBody(body);
         
-        String authtoken='ya29.a0AfB_byDhdepsxiZCAguDL_WFcu5QtJocudRXmacV6evg0vmC402hRDjw7gsVnRwdXhHlM_vulz3wFmvdTWEbGQAZlbi4tC-LzHX_jPrt2B8WXHmu8v_rMyxDzrqloOj76hNYQ78t3UdV0HydXDJNvGHWU5H1-afoM300j9ZQxqUaCgYKAfkSARISFQHsvYlsIaYb8Gl2BTBS5w-OPEbRkQ0178';
-        req.setHeader('Authorization', 'Bearer '+authtoken);
         req.setHeader('Content-Type','application/json');
         req.setMethod('POST');
         req.setTimeout(60 * 1000);
@@ -146,7 +98,7 @@ public class updateBulkGcontacts {
         List<Contact> updateGConacts = new List<Contact>();
         Http http = new Http();
         HttpRequest req = new HttpRequest();
-       	String body = '{"contacts":{';
+        String body = '{"contacts":{';
         for(Contact con : contactList){
             sfConactMap.put(con.ExternalSourceId__c, con);
             body += '"'+ con.ExternalSourceId__c +'":{"etag":"'+con.etag__c+'","names":[{"familyName":"'+con.LastName +'","givenName":"'+con.FirstName+'"}]';
@@ -159,10 +111,8 @@ public class updateBulkGcontacts {
         body = body.removeEnd(',');
         body += '},"readMask": "names","updateMask": "names,emailAddresses,phoneNumbers","sources":["READ_SOURCE_TYPE_CONTACT"]}';
         req.setBody(body);
-        String key = 'AIzaSyCfaCukF1akyPBunr6HfCtzBhSxdepCRiE';
-        String authtoken='ya29.a0AfB_byDhdepsxiZCAguDL_WFcu5QtJocudRXmacV6evg0vmC402hRDjw7gsVnRwdXhHlM_vulz3wFmvdTWEbGQAZlbi4tC-LzHX_jPrt2B8WXHmu8v_rMyxDzrqloOj76hNYQ78t3UdV0HydXDJNvGHWU5H1-afoM300j9ZQxqUaCgYKAfkSARISFQHsvYlsIaYb8Gl2BTBS5w-OPEbRkQ0178';
-        req.setEndpoint('https://people.googleapis.com/v1/people:batchUpdateContacts?sources=READ_SOURCE_TYPE_CONTACT&key='+key);    
-        req.setHeader('Authorization', 'Bearer ' + authtoken);
+        String key = 'AIzaSyCfaCukF1akyPBunr6HfCtzBhSxdepCRiE';    
+        req.setEndpoint('callout:Connectsalesforces' +'/v1/people:batchUpdateContacts?sources=READ_SOURCE_TYPE_CONTACT');    
         req.setHeader('Content-Type','application/json');
         req.setMethod('POST');
         HttpResponse response = http.send(req);           
@@ -189,20 +139,5 @@ public class updateBulkGcontacts {
             GoogleApiQueueable.isDisableTrigger = false; 
         }
         
-    }
-    
-    public class getAccessToken {
-        public String access_token {get; set;}
-        public String token_type {get; set;}
-        public String expires_in {get; set;}
-        public String scope {get; set;}
-        public String jti {get; set;}
-    }
-    
-    public class googleContactInfo {
-        public string name{get; set;}
-        public List<String> email{get; set;}
-        public List<string> phone{get; set;}
-        public String photourl{get; set;}
     }
 }
