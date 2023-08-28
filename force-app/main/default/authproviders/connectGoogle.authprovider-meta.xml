@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AuthProvider xmlns="http://soap.sforce.com/2006/04/metadata">
+    <authorizeUrl>https://accounts.google.com/o/oauth2/auth</authorizeUrl>
+    <consumerKey>731692654244-jkahog3pcn6rh079p463rrdl3is62km0.apps.googleusercontent.com</consumerKey>
+    <consumerSecret>Placeholder_Value</consumerSecret>
+    <defaultScopes>https://www.googleapis.com/auth/contacts</defaultScopes>
+    <friendlyName>connectGoogle</friendlyName>
+    <includeOrgIdInIdentifier>false</includeOrgIdInIdentifier>
+    <providerType>Google</providerType>
+    <requireMfa>false</requireMfa>
+    <sendAccessTokenInHeader>false</sendAccessTokenInHeader>
+    <sendClientCredentialsInHeader>false</sendClientCredentialsInHeader>
+    <sendSecretInApis>true</sendSecretInApis>
+    <tokenUrl>https://accounts.google.com/o/oauth2/token</tokenUrl>
+</AuthProvider>
